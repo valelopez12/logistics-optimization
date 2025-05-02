@@ -94,7 +94,6 @@ Adjust these parameters in the Streamlit sidebar:
      Order Creation Date, Expected Load Date, Expected Delivery Date,
      Actual Load Date, Actual Delivery Date, Temperature
      ```
-    * For Perrigo: The daily report generated in the logistics team works for this model. Just make sure that the first row of the dataset are the variable names. All extra columns in the daily report will be automatically removed in case they are not needed for the optimization. 
  
 3. **Set parameters using the sidebar sliders**
 
