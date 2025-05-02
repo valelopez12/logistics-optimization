@@ -16,28 +16,29 @@ The optimizer reads shipment orders from an Excel file, geocodes pickup and deli
 ## Features
 
 * **Data Cleaning & Sampling**
-  Deduplicates orders, filters columns, handles missing data, and samples a subset of orders.
+  Deduplicates orders, filters columns, handles missing data and samples a subset of orders.
 
 * **Geocoding & Distance Calculation**
   Uses Nominatim (OpenStreetMap) to convert addresses to latitude/longitude.
   Computes geodesic distance between load and delivery points.
 
 * **Clustering**
-  Groups deliveries into user‐specified number of regions via K-Means.
+  Groups deliveries into cluster via K-Means representing the different regions in Europe.
 
 * **Optimization Model**
   Mixed-integer programming (Pyomo + Gurobi) to assign orders to trucks under capacity constraints.
-  Balances fixed truck cost (α) vs. distance cost (β).
+  Balances fixed truck allocation (α) vs. distance (β).
 
 * **Interactive Dashboard**
   Streamlit interface for parameter adjustment, file upload, and visualization.
   Downloadable Excel reports for assignments, utilization, and summary.
-  Plots: utilization bar chart, pallet volume by region, distance distribution.
+  KPI: trucks used, truck utilization (%), pallet qty and distance travelled. 
+  Plots: utilization bar chart, pallet volume by region and distance distribution.
 
 ## Prerequisites
 
 * Python 3.8 or higher
-* Gurobi with an Academic WLS license (environment variables set)
+* Gurobi with an Academic WLS license (environment variables set) 
 * Internet access (for geocoding via Nominatim)
 
 ## Installation
@@ -93,7 +94,8 @@ Adjust these parameters in the Streamlit sidebar:
      Order Creation Date, Expected Load Date, Expected Delivery Date,
      Actual Load Date, Actual Delivery Date, Temperature
      ```
-
+    * For Perrigo: The daily report generated in the logistics team works for this model. Just make sure that the first row of the dataset are the variable names. All extra columns in the daily report will be automatically removed in case they are not needed for the optimization. 
+ 
 3. **Set parameters using the sidebar sliders**
 
    * Number of Regions (2–15)
@@ -111,6 +113,7 @@ Adjust these parameters in the Streamlit sidebar:
      * Truck Assignments
      * Truck Utilization
      * Summary Report
+   * Key Performance Indicators
    * Interactive dataframes and plots displayed in the app.
 
 ## File Structure
@@ -125,8 +128,8 @@ Adjust these parameters in the Streamlit sidebar:
   Defines `run_logistics_optimization(file_path, n_clusters, alpha, beta, sample_size, max_retries)`, returns `(assignments_df, util_df, df_clean)`.
 
 * **app.py**
-  Implements Streamlit UI: sliders, file uploader, download links, tables, and charts.
+  Implements Streamlit UI: sliders, file uploader, download links, tables and charts.
 
 ## License
 
-This project is licensed under the **Gurobi Academic WLS** license.
+This project is licensed under the **Gurobi Academic WLS** license. In case this license is not available replace with an open source solver like "GLPK". These are much slower than Gurobi and may requiere smaller sample sizes to fully optimize the logistics process. 
