@@ -14,6 +14,7 @@ def to_excel_download_link(df, filename):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">Download {filename}</a>'
     return href
 
+
 def main():
     st.title("Logistics Optimization Dashboard")
 
@@ -38,17 +39,29 @@ def main():
 
             st.success("Optimization complete.")
 
+            # --- KPIs ---
+            total_trucks = util_df['truck'].nunique()
+            avg_util = util_df['utilization_pct'].mean()
+            total_pallets = assignments_df['pallet_qty'].sum()
+            total_distance = util_df['total_distance_km'].sum()
+
+            st.subheader("Key Performance Indicators")
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Trucks Used", total_trucks)
+            col2.metric("Avg. Utilization %", f"{avg_util:.2f}%")
+            col3.metric("Total Pallets", total_pallets)
+            col4.metric("Total Distance (km)", f"{total_distance:.0f}")
+
             # Create summary report
             df_summary = df_clean.copy()
             df_summary['order_id'] = df_summary['order_id'].astype(str)
 
             summary = pd.merge(assignments_df, df_summary, on='order_id', how='left')
 
-            # Use exact column names from the merged result
             summary = summary[[
                 'order_id',
                 'company',
-                'pallet_qty_x',  # comes from assignments_df
+                'pallet_qty_x',
                 'load_address',
                 'load_coords',
                 'delivery_address',
@@ -86,6 +99,7 @@ def main():
             st.subheader("Truck Utilization")
             st.dataframe(util_df)
 
+            # Visualization: Utilization
             st.subheader("Truck Utilization (%)")
             fig1, ax1 = plt.subplots(figsize=(12, 5))
             util_sorted = util_df.sort_values("utilization_pct")
@@ -94,6 +108,7 @@ def main():
             ax1.set_xticklabels(util_sorted['truck'], rotation=45, ha='right')
             st.pyplot(fig1)
 
+            # Visualization: Pallet Volume
             st.subheader("Pallet Volume by Region")
             volume = assignments_df.groupby('cluster')['pallet_qty'].sum().sort_values()
             fig2, ax2 = plt.subplots()
@@ -101,6 +116,7 @@ def main():
             ax2.set_xlabel("Pallets")
             st.pyplot(fig2)
 
+            # Visualization: Distance Distribution
             st.subheader("Delivery Distance by Region")
             fig3, ax3 = plt.subplots()
             sns.boxplot(data=df_clean, x='cluster_name', y='distance_km', ax=ax3)
